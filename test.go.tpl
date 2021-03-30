@@ -3,10 +3,13 @@
 {{- if $v.Post }}
 {{- if not $v.Post.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Post.Parameters) }}
-{{- $c := $v.Post.RequestBody }}
-{{- if $c }}
-{{- $d := index $c.Value.Content "application/json" }}
+{{- with $c := $v.Post.RequestBody }}
+{{- with $d := index $c.Value.Content "application/json" }}
 post(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}},{{- json $d.Schema.Value.Example -}})
+{{- end }}
+{{- with $d := index $c.Value.Content "application/x-www-form-urlencoded" }}
+post_form(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{"}"}})
+{{- end }}
 {{- else }}
 post(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {})
 {{- end }}
@@ -21,8 +24,16 @@ get(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Patch.Parameters) }}
-{{- $ep := (ExplodeParams $v.Patch.Parameters) }}
-patch(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{- range $i, $n  := $ep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}})
+{{- with $c := $v.Patch.RequestBody }}
+{{- with $d := index $c.Value.Content "application/json" }}
+patch(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}},{{- json $d.Schema.Value.Example -}})
+{{- end }}
+{{- with $d := index $c.Value.Content "application/x-www-form-urlencoded" }}
+patch_form(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{"}"}})
+{{- end }}
+{{- else }}
+patch(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {})
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
