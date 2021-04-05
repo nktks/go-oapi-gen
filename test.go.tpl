@@ -21,6 +21,7 @@ post(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}'
 {{- $ep := (ExplodeParams $v.Get.Parameters) }}
 get(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{- range $i, $n  := $ep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}})
 {{- end }}
+{{- end }}
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Patch.Parameters) }}
@@ -33,7 +34,6 @@ patch_form(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Na
 {{- end }}
 {{- else }}
 patch(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {})
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
