@@ -10,6 +10,9 @@ post(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}'
 {{- with $d := index $c.Value.Content "application/x-www-form-urlencoded" }}
 post_form(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{"}"}})
 {{- end }}
+{{- with $d := index $c.Value.Content "multipart/form-data" }}
+post_form(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {{"{"}}{{"}"}})
+{{- end }}
 {{- else }}
 post(self, '{{ $k }}', {{"{"}}{{- range $i, $n  := $nep -}}'{{ $n.Value.Name }}':'{{ $n.Value.Name }}',{{- end -}}{{"}"}}, {})
 {{- end }}
