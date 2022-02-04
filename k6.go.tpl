@@ -52,30 +52,31 @@ function resolve_path(path, params) {
 {{- $camelPath := (regexReplaceAll "/|{|}" $k "") | camelcase  }}
 {{- if $v.Post }}
 {{- if not $v.Post.Deprecated }}
-var post{{ $camelPath }}Latency = new Trend("post{{ $k }}");
+var post{{ $camelPath }}Latency = new Trend("post {{ $k }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Get }}
 {{- if not $v.Get.Deprecated }}
-var get{{ $camelPath }}Latency = new Trend("get:{{ $k }}");
+var get{{ $camelPath }}Latency = new Trend("get {{ $k }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
-var patch{{ $camelPath }}Latency = new Trend("patch:{{ $k }}");
+var patch{{ $camelPath }}Latency = new Trend("patch {{ $k }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Delete }}
 {{- if not $v.Delete.Deprecated }}
-var delete{{ $camelPath }}Latency = new Trend("delete:{{ $k }}");
+var delete{{ $camelPath }}Latency = new Trend("delete {{ $k }}");
 {{- end }}
 {{- end }}
 
 {{- end }}
-{
+export default function() {
+    group("vu scenario", () => {
 {{- range $k, $v  := .Paths }}
 {{- $camelPath := (regexReplaceAll "/|{|}" $k "") | camelcase  }}
 
@@ -85,35 +86,35 @@ var delete{{ $camelPath }}Latency = new Trend("delete:{{ $k }}");
 {{- with $c := $v.Post.RequestBody }}
 {{- with $d := index $c.Value.Content "application/json" }}
 
-    group("post:{{ $k }}", () => {
-        let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
-        // TODO: edit the parameters of the request body.
-        let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
-        var item = data[exec.scenario.iterationInTest];
+      (function() {
+          let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
+          // TODO: edit the parameters of the request body.
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          var item = data[exec.scenario.iterationInTest];
 {{- if $v.Post.Security }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${item.session}`
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${item.session}`
+            }
+          };
 {{- else }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          };
 {{- end }}
-        let request = http.post(url, body, options);
-        post{{ $camelPath }}Latency.add(request.timings.duration);
-        check(request, {
-            "OK": (r) => r.status === 200
-        });
-        check(request, {
-            "エラーレスポンス": (r) => r.status === 200
-        });
-        sleep(SLEEP_DURATION);
-    });
+          let request = http.post(url, body, options);
+          post{{ $camelPath }}Latency.add(request.timings.duration);
+          check(request, {
+              "OK": (r) => r.status === 200
+          });
+          check(request, {
+              "エラーレスポンス": (r) => r.status === 200
+          });
+          sleep(SLEEP_DURATION);
+      })();
 {{- end }}
 {{- end }}
 {{- end }}
@@ -125,32 +126,32 @@ var delete{{ $camelPath }}Latency = new Trend("delete:{{ $k }}");
 {{- $nep := (NonExplodeParams $v.Get.Parameters) }}
 {{- $ep := (ExplodeParams $v.Get.Parameters) }}
 
-    group("get:{{ $k }}", () => {
-        let url = new URL(resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }}));
+      (function() {
+          let url = new URL(resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }}));
 {{- range $i, $n  := $ep }}
-        url.searchParams.append('{{ $n.Value.Name }}', '{{ $n.Value.Name }}');
+          url.searchParams.append('{{ $n.Value.Name }}', '{{ $n.Value.Name }}');
 {{- end }}
-        var item = data[exec.scenario.iterationInTest];
+          var item = data[exec.scenario.iterationInTest];
 {{- if $v.Get.Security }}
-        const options = {
-          headers: {
-            Authorization: `Bearer ${item.session}`
-          }
-        };
+          const options = {
+            headers: {
+              Authorization: `Bearer ${item.session}`
+            }
+          };
 {{- else }}
-        let options = {};
+          let options = {};
 {{- end }}
 
-        let request = http.get(url.toString(), options);
-        get{{ $camelPath }}Latency.add(request.timings.duration);
-        check(request, {
-            "ok": (r) => r.status === 200
-        });
-        check(request, {
-            "エラーレスポンス": (r) => r.status === 200
-        });
-        sleep(SLEEP_DURATION);
-    });
+          let request = http.get(url.toString(), options);
+          get{{ $camelPath }}Latency.add(request.timings.duration);
+          check(request, {
+              "ok": (r) => r.status === 200
+          });
+          check(request, {
+              "エラーレスポンス": (r) => r.status === 200
+          });
+          sleep(SLEEP_DURATION);
+      })();
 {{- end }}
 {{- end }}
 
@@ -160,35 +161,35 @@ var delete{{ $camelPath }}Latency = new Trend("delete:{{ $k }}");
 {{- with $c := $v.Patch.RequestBody }}
 {{- with $d := index $c.Value.Content "application/json" }}
 
-    group("patch:{{ $k }}", () => {
-        let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
-        // TODO: edit the parameters of the request body.
-        let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
-        var item = data[exec.scenario.iterationInTest];
+      (function() {
+          let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
+          // TODO: edit the parameters of the request body.
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          var item = data[exec.scenario.iterationInTest];
 {{- if $v.Patch.Security }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${item.session}`
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${item.session}`
+            }
+          };
 {{- else }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          };
 {{- end }}
-        let request = http.patch(url, body, options);
-        patch{{ $camelPath }}Latency.add(request.timings.duration);
-        check(request, {
-            "OK": (r) => r.status === 200
-        });
-        check(request, {
-            "エラーレスポンス": (r) => r.status === 200
-        });
-        sleep(SLEEP_DURATION);
-    });
+          let request = http.patch(url, body, options);
+          patch{{ $camelPath }}Latency.add(request.timings.duration);
+          check(request, {
+              "OK": (r) => r.status === 200
+          });
+          check(request, {
+              "エラーレスポンス": (r) => r.status === 200
+          });
+          sleep(SLEEP_DURATION);
+      })();
 {{- end }}
 {{- end }}
 {{- end }}
@@ -200,38 +201,40 @@ var delete{{ $camelPath }}Latency = new Trend("delete:{{ $k }}");
 {{- with $c := $v.Delete.RequestBody }}
 {{- with $d := index $c.Value.Content "application/json" }}
 
-    group("delete:{{ $k }}", () => {
-        let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
-        // TODO: edit the parameters of the request body.
-        let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
-        var item = data[exec.scenario.iterationInTest];
+      (function() {
+          let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
+          // TODO: edit the parameters of the request body.
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          var item = data[exec.scenario.iterationInTest];
 {{- if $v.Delete.Security }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${item.session}`
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${item.session}`
+            }
+          };
 {{- else }}
-        let options = {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        };
+          let options = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          };
 {{- end }}
-        let request = http.del(url, body, options);
-        delete{{ $camelPath }}Latency.add(request.timings.duration);
-        check(request, {
-            "OK": (r) => r.status === 200
-        });
-        check(request, {
-            "エラーレスポンス": (r) => r.status === 200
-        });
-        sleep(SLEEP_DURATION);
-    });
+          let request = http.del(url, body, options);
+          delete{{ $camelPath }}Latency.add(request.timings.duration);
+          check(request, {
+              "OK": (r) => r.status === 200
+          });
+          check(request, {
+              "エラーレスポンス": (r) => r.status === 200
+          });
+          sleep(SLEEP_DURATION);
+      })();
 {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
 
 {{- end }}
+    });
+}
