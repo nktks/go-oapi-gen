@@ -56,6 +56,18 @@ func main() {
 		return &nep
 
 	}
+	funcMap["paramsToJSON"] = func(params *openapi3.Parameters) string {
+		b := "{"
+		for i, v := range *params {
+			if i == len(*params)-1 {
+				b = fmt.Sprintf("%s\"%s\":\"%s\"", b, v.Value.Name, v.Value.Name)
+			} else {
+				b = fmt.Sprintf("%s\"%s\":\"%s\",", b, v.Value.Name, v.Value.Name)
+			}
+		}
+		b = b + "}"
+		return b
+	}
 	funcMap["json"] = func(i interface{}) string {
 		b, err := json.Marshal(i)
 		if err != nil {
