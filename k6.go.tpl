@@ -18,7 +18,7 @@ const SLEEP_DURATION = 0.1;
 // data for each vu
 const data = new SharedArray("my dataset", function(){
     const ids = [
-//        {'id':1, 'session':'session', 'name':'name1'},
+        {'id':1, 'session':'session', 'name':'name1'},
     ];
     return ids;
 });
@@ -50,27 +50,28 @@ function resolve_path(path, params) {
 
 {{- range $k, $v  := .Paths }}
 {{- $camelPath := (regexReplaceAll "/|{|}" $k "") | camelcase  }}
+{{- $metrics := regexReplaceAll "}" (regexReplaceAll "{" $k "(") ")" }}
 {{- if $v.Post }}
 {{- if not $v.Post.Deprecated }}
-var post{{ $camelPath }}Latency = new Trend("post {{ $k }}");
+var post{{ $camelPath }}Latency = new Trend("post {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Get }}
 {{- if not $v.Get.Deprecated }}
-var get{{ $camelPath }}Latency = new Trend("get {{ $k }}");
+var get{{ $camelPath }}Latency = new Trend("get {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
-var patch{{ $camelPath }}Latency = new Trend("patch {{ $k }}");
+var patch{{ $camelPath }}Latency = new Trend("patch {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Delete }}
 {{- if not $v.Delete.Deprecated }}
-var delete{{ $camelPath }}Latency = new Trend("delete {{ $k }}");
+var delete{{ $camelPath }}Latency = new Trend("delete {{ $metrics }}");
 {{- end }}
 {{- end }}
 
