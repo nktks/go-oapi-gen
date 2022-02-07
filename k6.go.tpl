@@ -84,13 +84,17 @@ export default function() {
 {{- if $v.Post }}
 {{- if not $v.Post.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Post.Parameters) }}
-{{- with $c := $v.Post.RequestBody }}
-{{- with $d := index $c.Value.Content "application/json" }}
 
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
+{{- with $c := $v.Post.RequestBody }}
+{{- with $d := index $c.Value.Content "application/json" }}
           let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
+{{- end }}
+{{- else }}
+          let body = {};
+{{- end }}
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Post.Security }}
           let options = {
@@ -116,8 +120,6 @@ export default function() {
           });
           sleep(SLEEP_DURATION);
       })();
-{{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -159,13 +161,17 @@ export default function() {
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Patch.Parameters) }}
-{{- with $c := $v.Patch.RequestBody }}
-{{- with $d := index $c.Value.Content "application/json" }}
 
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
+{{- with $c := $v.Patch.RequestBody }}
+{{- with $d := index $c.Value.Content "application/json" }}
           let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
+{{- end }}
+{{- else }}
+          let body = {};
+{{- end }}
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Patch.Security }}
           let options = {
@@ -193,19 +199,21 @@ export default function() {
       })();
 {{- end }}
 {{- end }}
-{{- end }}
-{{- end }}
 
 {{- if $v.Delete }}
 {{- if not $v.Delete.Deprecated }}
 {{- $nep := (NonExplodeParams $v.Delete.Parameters) }}
-{{- with $c := $v.Delete.RequestBody }}
-{{- with $d := index $c.Value.Content "application/json" }}
 
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
+{{- with $c := $v.Delete.RequestBody }}
+{{- with $d := index $c.Value.Content "application/json" }}
           let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
+{{- end }}
+{{- else }}
+          let body = {};
+{{- end }}
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Delete.Security }}
           let options = {
@@ -231,8 +239,6 @@ export default function() {
           });
           sleep(SLEEP_DURATION);
       })();
-{{- end }}
-{{- end }}
 {{- end }}
 {{- end }}
 
