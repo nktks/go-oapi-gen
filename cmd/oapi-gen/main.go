@@ -68,6 +68,12 @@ func main() {
 		b = b + "}"
 		return b
 	}
+	funcMap["firstExample"] = func(examples map[string]*openapi3.ExampleRef) interface{} {
+		for _, v := range examples {
+			return v.Value.Value
+		}
+		return nil
+	}
 	funcMap["json"] = func(i interface{}) string {
 		b, err := json.Marshal(i)
 		if err != nil {

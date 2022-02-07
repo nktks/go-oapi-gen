@@ -90,7 +90,7 @@ export default function() {
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
-          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Post.Security }}
           let options = {
@@ -165,7 +165,7 @@ export default function() {
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
-          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Patch.Security }}
           let options = {
@@ -205,7 +205,7 @@ export default function() {
       (function() {
           let url = resolve_path(BASE_URL + `{{ $k }}`, {{ $nep | paramsToJSON }});
           // TODO: edit the parameters of the request body.
-          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{}{{ end }};
+          let body = {{ if $d.Schema.Value.Example }}{{ json $d.Schema.Value.Example }}{{ else }}{{ if $d.Examples}}{{ json (firstExample $d.Examples) }}{{ else }}{}{{ end }}{{ end }};
           var item = data[exec.scenario.iterationInTest];
 {{- if $v.Delete.Security }}
           let options = {
