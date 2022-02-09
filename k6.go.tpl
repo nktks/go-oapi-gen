@@ -110,7 +110,7 @@ export default function() {
             }
           };
 {{- end }}
-          let request = http.post(url, body, options);
+          let request = http.post(url, JSON.stringify(body), options);
           post{{ $camelPath }}Latency.add(request.timings.duration);
           check(request, {
               "OK": (r) => r.status === 200
@@ -187,7 +187,7 @@ export default function() {
             }
           };
 {{- end }}
-          let request = http.patch(url, body, options);
+          let request = http.patch(url, JSON.stringify(body), options);
           patch{{ $camelPath }}Latency.add(request.timings.duration);
           check(request, {
               "OK": (r) => r.status === 200
@@ -229,7 +229,7 @@ export default function() {
             }
           };
 {{- end }}
-          let request = http.del(url, body, options);
+          let request = http.del(url, JSON.stringify(body), options);
           delete{{ $camelPath }}Latency.add(request.timings.duration);
           check(request, {
               "OK": (r) => r.status === 200
