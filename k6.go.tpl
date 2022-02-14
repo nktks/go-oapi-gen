@@ -7,7 +7,7 @@ import exec from "k6/execution";
 import crypto from 'k6/crypto';
 import { group, check, sleep } from "k6";
 import { SharedArray } from "k6/data";
-import { Trend } from "k6/metrics";
+import { Trend, Rate } from "k6/metrics";
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 {{ $server := index .Servers 0 }}
 const BASE_URL = "{{ $server.URL }}";
@@ -54,24 +54,28 @@ function resolve_path(path, params) {
 {{- if $v.Post }}
 {{- if not $v.Post.Deprecated }}
 var post{{ $camelPath }}Latency = new Trend("post {{ $metrics }}");
+var post{{ $camelPath }}ErrorRate = new Rate("post {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Get }}
 {{- if not $v.Get.Deprecated }}
 var get{{ $camelPath }}Latency = new Trend("get {{ $metrics }}");
+var get{{ $camelPath }}ErrorRate = new Rate("get {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Patch }}
 {{- if not $v.Patch.Deprecated }}
 var patch{{ $camelPath }}Latency = new Trend("patch {{ $metrics }}");
+var patch{{ $camelPath }}ErrorRate = new Rate("patch {{ $metrics }}");
 {{- end }}
 {{- end }}
 
 {{- if $v.Delete }}
 {{- if not $v.Delete.Deprecated }}
 var delete{{ $camelPath }}Latency = new Trend("delete {{ $metrics }}");
+var delete{{ $camelPath }}ErrorRate = new Rate("delete {{ $metrics }}");
 {{- end }}
 {{- end }}
 
@@ -112,6 +116,7 @@ export default function() {
 {{- end }}
           let request = http.post(url, JSON.stringify(body), options);
           post{{ $camelPath }}Latency.add(request.timings.duration);
+          post{{ $camelPath }}ErrorRate.add(resp.status >= 400);
           check(request, {
               "OK": (r) => r.status === 200
           });
@@ -147,6 +152,7 @@ export default function() {
 
           let request = http.get(url.toString(), options);
           get{{ $camelPath }}Latency.add(request.timings.duration);
+          get{{ $camelPath }}ErrorRate.add(resp.status >= 400);
           check(request, {
               "ok": (r) => r.status === 200
           });
@@ -189,6 +195,7 @@ export default function() {
 {{- end }}
           let request = http.patch(url, JSON.stringify(body), options);
           patch{{ $camelPath }}Latency.add(request.timings.duration);
+          patch{{ $camelPath }}ErrorRate.add(resp.status >= 400);
           check(request, {
               "OK": (r) => r.status === 200
           });
@@ -231,6 +238,7 @@ export default function() {
 {{- end }}
           let request = http.del(url, JSON.stringify(body), options);
           delete{{ $camelPath }}Latency.add(request.timings.duration);
+          delete{{ $camelPath }}ErrorRate.add(resp.status >= 400);
           check(request, {
               "OK": (r) => r.status === 200
           });
